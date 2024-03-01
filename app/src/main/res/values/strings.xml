@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Today</string>
+
+    <string name="api_url">API URL</string>
+    <string name="api_key">API Key</string>
+
+    <string name="model">Model</string>
+    <string name="prompt">Prompt</string>
+
+    <string name="periodicity">Periodicity</string>
+
+    <string name="every_hour">Once an hour</string>
+    <string name="every_hours">Once every %1$d hours</string>
+    <string name="every_hours_5h">Once every %1$d hours</string>
+
+    <string name="context_size">Context size</string>
+
+    <string name="apply">Apply</string>
+
+    <string name="free_testing">Free for testing</string>
+</resources>
