@@ -14,10 +14,19 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.wavecat.today.MainViewModel
 import com.wavecat.today.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SetupScaffold(scrollBehavior: TopAppBarScrollBehavior, viewModel: MainViewModel) {
+fun SetupScaffold(
+    coroutineScope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    scrollBehavior: TopAppBarScrollBehavior,
+    viewModel: MainViewModel
+) {
+    val successString = stringResource(R.string.success)
+
     Scaffold(
         topBar = {
             LargeTopAppBar(
@@ -27,10 +36,19 @@ fun SetupScaffold(scrollBehavior: TopAppBarScrollBehavior, viewModel: MainViewMo
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { viewModel.apply() },
+                onClick = {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(successString)
+                    }
+
+                    viewModel.apply()
+                },
                 icon = { Icon(Icons.Filled.Check, stringResource(R.string.apply)) },
                 text = { Text(stringResource(R.string.apply)) },
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->

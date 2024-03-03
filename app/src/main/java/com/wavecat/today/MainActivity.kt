@@ -8,6 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,6 +37,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             TodayTheme {
+                val snackbarHostState = remember { SnackbarHostState() }
+
                 val viewModel = viewModel {
                     MainViewModel(
                         DataRepository(application),
@@ -49,6 +53,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     SetupScaffold(
+                        coroutineScope = rememberCoroutineScope(),
+                        snackbarHostState = snackbarHostState,
                         scrollBehavior = scrollBehavior,
                         viewModel = viewModel
                     )

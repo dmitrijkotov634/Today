@@ -5,7 +5,9 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Context.BATTERY_SERVICE
 import android.content.pm.PackageManager
+import android.os.BatteryManager
 import android.os.Build
 import android.service.notification.StatusBarNotification
 import androidx.core.app.ActivityCompat
@@ -51,20 +53,23 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
         }
     }
 
+    private val replaceable = mapOf(
+        NOTIFICATIONS_VAR to ::getNotifications,
+        BATTERY_LEVEL_VAR to ::getBatteryLevel,
+        DATE_AND_TIME_VAR to {
+            val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm", Locale.ENGLISH)
+            dateFormat.format(Date())
+        }
+    )
+
     override suspend fun doWork(): Result {
         val repository = DataRepository(applicationContext)
 
         var prompt = repository.prompt
 
-        if (prompt.contains(NOTIFICATIONS_VAR))
-            prompt = prompt.replace(NOTIFICATIONS_VAR, getNotifications())
-
-        if (prompt.contains(DATE_AND_TIME_VAR)) {
-            val dateFormat = SimpleDateFormat(
-                "yyyy-MM-dd HH:mm", Locale.ENGLISH
-            )
-
-            prompt = prompt.replace(DATE_AND_TIME_VAR, dateFormat.format(Date()))
+        for ((k, v) in replaceable) {
+            if (prompt.contains(k))
+                prompt = prompt.replace(k, v())
         }
 
         val inputMessages = trimMessages(
@@ -108,30 +113,37 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
         return Result.success()
     }
 
+    private fun getBatteryLevel(): String {
+        val bm: BatteryManager = applicationContext.getSystemService(BATTERY_SERVICE) as BatteryManager
+        return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY).toString()
+    }
+
     private fun getNotifications(): String = buildString {
         val notificationService: NotificationService = NotificationService.get() ?: return@buildString
         val notifications: Array<StatusBarNotification> = notificationService.getActiveNotifications()
 
-        notifications.forEach {
-            if (it.packageName == applicationContext.packageName) return@forEach
+        notifications.forEachIndexed { index, notification ->
+            if (notification.packageName == applicationContext.packageName) return@forEachIndexed
+
+            append("${index + 1}. ")
 
             runCatching {
                 val packageManager: PackageManager = applicationContext.packageManager
-                val info = packageManager.getApplicationInfo(it.packageName, PackageManager.GET_META_DATA)
+                val info = packageManager.getApplicationInfo(notification.packageName, PackageManager.GET_META_DATA)
                 packageManager.getApplicationLabel(info) as String
             }.onSuccess { appName ->
                 append("$appName: ")
             }
 
-            it.notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.run {
+            notification.notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.run {
                 append(this)
                 append(": ")
             }
 
-            if (it.notification.extras.getCharSequence(Notification.EXTRA_BIG_TEXT) != null) {
-                append(it.notification.extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
-            } else if (it.notification.extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
-                append(it.notification.extras.getCharSequence(Notification.EXTRA_TEXT))
+            if (notification.notification.extras.getCharSequence(Notification.EXTRA_BIG_TEXT) != null) {
+                append(notification.notification.extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
+            } else if (notification.notification.extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
+                append(notification.notification.extras.getCharSequence(Notification.EXTRA_TEXT))
             }
 
             append("\n")
@@ -202,5 +214,6 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
         private const val NOTIFICATIONS_VAR = "%NOTIFICATIONS%"
         private const val DATE_AND_TIME_VAR = "%DATETIME%"
+        private const val BATTERY_LEVEL_VAR = "%BATTERYLEVEL%"
     }
 }

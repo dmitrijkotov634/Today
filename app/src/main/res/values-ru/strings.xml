@@ -16,6 +16,7 @@
     <string name="context_size">Размер контекста</string>
 
     <string name="apply">Применить</string>
+    <string name="success">Успешно</string>
 
     <string name="free_testing">Бесплатно для тестирования</string>
 </resources>

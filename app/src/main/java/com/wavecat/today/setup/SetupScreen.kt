@@ -120,7 +120,7 @@ fun SetupScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        HoursDropDown(
+        HoursDropdown(
             modifier = Modifier.width(220.dp),
             hours = notificationHours,
             onHoursChanged = {

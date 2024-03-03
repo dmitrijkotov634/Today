@@ -8,7 +8,7 @@ import com.wavecat.today.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HoursDropDown(hours: Int, onHoursChanged: (Int) -> Unit, modifier: Modifier) {
+fun HoursDropdown(hours: Int, onHoursChanged: (Int) -> Unit, modifier: Modifier) {
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(

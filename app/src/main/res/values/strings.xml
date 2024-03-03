@@ -16,6 +16,7 @@
     <string name="context_size">Context size</string>
 
     <string name="apply">Apply</string>
+    <string name="success">Success</string>
 
     <string name="free_testing">Free for testing</string>
 </resources>
