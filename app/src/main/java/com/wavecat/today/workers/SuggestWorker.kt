@@ -92,13 +92,17 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                 )
             }.body<CompletionsResult>()
         }.onFailure {
+            if (repository.showErrors)
+                notify(it.message.toString())
+
             it.printStackTrace()
-            notify(it.message.toString())
         }.onSuccess { response ->
             val message = response.choices?.get(0)?.message
 
             if (message == null) {
-                notify(response.error.toString())
+                if (repository.showErrors)
+                    notify(response.error.toString())
+
                 return@onSuccess
             }
 

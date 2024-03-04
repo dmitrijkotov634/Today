@@ -64,6 +64,15 @@ class DataRepository(context: Context) {
             }
         }
 
+    var showErrors: Boolean
+        get() = preferences.getBoolean(SHOW_ERRORS, false)
+        set(value) {
+            preferences.edit {
+                putBoolean(SHOW_ERRORS, value)
+                apply()
+            }
+        }
+
     var messageContext: List<Message>
         get() = Json.decodeFromString(preferences.getString(MESSAGE_CONTEXT, "[]")!!)
         set(value) {
@@ -79,6 +88,7 @@ class DataRepository(context: Context) {
         const val MODEL = "model"
         const val PROMPT = "prompt"
         const val CONTEXT_SIZE = "context_size"
+        const val SHOW_ERRORS = "show_errors"
         const val NOTIFICATION_HOURS = "notification_hours"
         const val MESSAGE_CONTEXT = "message_context"
     }

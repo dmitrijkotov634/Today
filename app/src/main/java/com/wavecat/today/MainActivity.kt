@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.WorkManager
 import com.wavecat.today.setup.SetupScaffold
@@ -19,6 +20,7 @@ import com.wavecat.today.ui.theme.TodayTheme
 
 
 class MainActivity : ComponentActivity() {
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +46,13 @@ class MainActivity : ComponentActivity() {
                         DataRepository(application),
                         WorkManager.getInstance(application)
                     )
+                }
+
+                LifecycleResumeEffect(Unit) {
+                    viewModel.onResume()
+                    onPauseOrDispose {
+                        viewModel.onPause()
+                    }
                 }
 
                 val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())

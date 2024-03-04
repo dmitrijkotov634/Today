@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Error(
     val message: String,
-    val type: String
+    val type: String? = null
 )

@@ -71,6 +71,14 @@ class MainViewModel(
         repository.notificationHours = value
     }
 
+    fun onPause() {
+        repository.showErrors = false
+    }
+
+    fun onResume() {
+        repository.showErrors = true
+    }
+
     fun apply() {
         repository.messageContext = emptyList()
 
