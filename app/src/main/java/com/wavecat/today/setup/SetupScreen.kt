@@ -1,5 +1,6 @@
 package com.wavecat.today.setup
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.wavecat.today.Constant
 import com.wavecat.today.R
 import com.wavecat.today.ui.theme.TodayTheme
+import com.wavecat.today.worker.SuggestWorker
 
 @Composable
 fun SetupScreen(
@@ -111,8 +113,24 @@ fun SetupScreen(
             label = { Text(stringResource(R.string.prompt)) },
             singleLine = false,
             minLines = 12,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = VariableTransformation(
+                MaterialTheme.colorScheme.primary
+            )
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            for (variable in variables) {
+                SuggestionChip(
+                    onClick = { setPrompt("$prompt $variable") },
+                    label = { Text(variable) }
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+        }
 
         Spacer(modifier = Modifier.height(14.dp))
 
@@ -132,6 +150,12 @@ fun SetupScreen(
     }
 }
 
+val variables = listOf(
+    SuggestWorker.NOTIFICATIONS_VAR,
+    SuggestWorker.SCREEN_CONTENT_VAR,
+    SuggestWorker.BATTERY_LEVEL_VAR,
+    SuggestWorker.DATE_AND_TIME_VAR
+)
 
 @Preview(showBackground = true)
 @Composable

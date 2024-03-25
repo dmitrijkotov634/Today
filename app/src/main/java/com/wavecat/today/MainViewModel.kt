@@ -2,7 +2,7 @@ package com.wavecat.today
 
 import androidx.lifecycle.ViewModel
 import androidx.work.*
-import com.wavecat.today.workers.SuggestWorker
+import com.wavecat.today.worker.SuggestWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.TimeUnit
