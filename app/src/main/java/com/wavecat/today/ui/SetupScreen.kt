@@ -1,4 +1,4 @@
-package com.wavecat.today.setup
+package com.wavecat.today.ui
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -40,13 +40,15 @@ fun SetupScreen(
             .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())
     ) {
+        val isTestEndpoint = apiUrl == Constant.TEST_ENDPOINT
+
         OutlinedTextField(
             value = apiUrl,
             onValueChange = { setApiUrl(it) },
             label = { Text(stringResource(R.string.api_url)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            enabled = apiUrl != Constant.TEST_ENDPOINT
+            enabled = !isTestEndpoint
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -74,7 +76,7 @@ fun SetupScreen(
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            enabled = apiUrl != Constant.TEST_ENDPOINT
+            enabled = !isTestEndpoint
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -85,7 +87,7 @@ fun SetupScreen(
             label = { Text(stringResource(R.string.model)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            enabled = apiUrl != Constant.TEST_ENDPOINT
+            enabled = !isTestEndpoint
         )
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -103,7 +105,7 @@ fun SetupScreen(
                 value = contextSize.toFloat(),
                 onValueChange = { setContextSize(it.toInt()) },
                 valueRange = 1000f..4000f,
-                enabled = apiUrl != Constant.TEST_ENDPOINT,
+                enabled = !isTestEndpoint,
                 steps = 5
             )
         }
@@ -145,7 +147,7 @@ fun SetupScreen(
         IntervalDropdown(
             modifier = Modifier.width(220.dp),
             interval = interval,
-            startInterval = if (apiUrl == Constant.TEST_ENDPOINT) 1.hours else 0.milliseconds,
+            startInterval = if (isTestEndpoint) 1.hours else 0.milliseconds,
             onIntervalChanged = {
                 setInterval(it)
             }

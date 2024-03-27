@@ -15,7 +15,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.WorkManager
-import com.wavecat.today.setup.SetupScaffold
+import com.wavecat.today.ui.SetupScaffold
 import com.wavecat.today.ui.theme.TodayTheme
 
 

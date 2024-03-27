@@ -34,7 +34,7 @@
         </activity>
 
         <receiver
-            android:name=".widget.TodayWidgetReceiver"
+            android:name=".ui.widget.TodayWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

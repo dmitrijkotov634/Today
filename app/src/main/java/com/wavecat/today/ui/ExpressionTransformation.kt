@@ -1,4 +1,4 @@
-package com.wavecat.today.setup
+package com.wavecat.today.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString

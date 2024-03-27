@@ -1,4 +1,4 @@
-package com.wavecat.today.widget
+package com.wavecat.today.ui.widget
 
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver

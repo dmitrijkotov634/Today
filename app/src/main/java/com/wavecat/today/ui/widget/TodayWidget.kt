@@ -1,4 +1,4 @@
-package com.wavecat.today.widget
+package com.wavecat.today.ui.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable

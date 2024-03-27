@@ -23,7 +23,7 @@ import com.wavecat.today.DataRepository
 import com.wavecat.today.R
 import com.wavecat.today.services.NotificationService
 import com.wavecat.today.services.ScreenContentService
-import com.wavecat.today.widget.TodayWidget
+import com.wavecat.today.ui.widget.TodayWidget
 import com.wavecat.today.worker.models.CompletionsInput
 import com.wavecat.today.worker.models.CompletionsResult
 import com.wavecat.today.worker.models.Message

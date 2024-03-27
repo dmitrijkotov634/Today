@@ -1,4 +1,4 @@
-package com.wavecat.today.setup
+package com.wavecat.today.ui
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,25 +38,25 @@ fun IntervalDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            for (it in 10..60 step 15) {
+            for (minutes in 10..60 step 15) {
                 DropdownMenuItem(
                     onClick = {
-                        onIntervalChanged(it.minutes)
+                        onIntervalChanged(minutes.minutes)
                         expanded = false
                     },
-                    text = { Text(intervalValue(duration = it.minutes)) },
-                    enabled = startInterval <= it.minutes
+                    text = { Text(intervalValue(duration = minutes.minutes)) },
+                    enabled = startInterval <= minutes.minutes
                 )
             }
 
-            for (it in 1..13 step 2) {
+            for (hours in 1..13 step 2) {
                 DropdownMenuItem(
                     onClick = {
-                        onIntervalChanged(it.hours)
+                        onIntervalChanged(hours.hours)
                         expanded = false
                     },
-                    text = { Text(intervalValue(duration = it.hours)) },
-                    enabled = startInterval <= it.hours
+                    text = { Text(intervalValue(duration = hours.hours)) },
+                    enabled = startInterval <= hours.hours
                 )
             }
         }
