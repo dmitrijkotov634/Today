@@ -62,7 +62,7 @@ fun SetupScaffold(
             val contextSize by viewModel.contextSize.collectAsState()
             val prompt by viewModel.prompt.collectAsState()
             val model by viewModel.model.collectAsState()
-            val notificationHours by viewModel.notificationHours.collectAsState()
+            val interval by viewModel.interval.collectAsState()
 
             SetupScreen(
                 apiUrl = apiUrl,
@@ -73,8 +73,8 @@ fun SetupScaffold(
                 setModel = viewModel::setModel,
                 prompt = prompt,
                 setPrompt = viewModel::setPrompt,
-                notificationHours = notificationHours,
-                setNotificationHours = viewModel::setNotificationHours,
+                interval = interval,
+                setInterval = viewModel::setInterval,
                 contextSize = contextSize,
                 setContextSize = viewModel::setContextSize
             )

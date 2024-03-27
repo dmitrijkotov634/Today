@@ -11,6 +11,7 @@
 
     <string name="every_hour">Once an hour</string>
     <string name="every_hours">Once every %1$d hours</string>
+    <string name="every_minutes">Once every %1$d minutes</string>
     <string name="every_hours_5h">Once every %1$d hours</string>
 
     <string name="context_size">Context size</string>

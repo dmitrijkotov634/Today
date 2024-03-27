@@ -16,6 +16,9 @@ import com.wavecat.today.Constant
 import com.wavecat.today.R
 import com.wavecat.today.ui.theme.TodayTheme
 import com.wavecat.today.worker.SuggestWorker
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun SetupScreen(
@@ -27,8 +30,8 @@ fun SetupScreen(
     setModel: (String) -> Unit,
     prompt: String,
     setPrompt: (String) -> Unit,
-    notificationHours: Int,
-    setNotificationHours: (Int) -> Unit,
+    interval: Duration,
+    setInterval: (Duration) -> Unit,
     contextSize: Int,
     setContextSize: (Int) -> Unit
 ) {
@@ -114,8 +117,9 @@ fun SetupScreen(
             singleLine = false,
             minLines = 12,
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = VariableTransformation(
-                MaterialTheme.colorScheme.primary
+            visualTransformation = ExpressionTransformation(
+                MaterialTheme.colorScheme.primary,
+                variables = variables
             )
         )
 
@@ -138,11 +142,12 @@ fun SetupScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        HoursDropdown(
+        IntervalDropdown(
             modifier = Modifier.width(220.dp),
-            hours = notificationHours,
-            onHoursChanged = {
-                setNotificationHours(it)
+            interval = interval,
+            startInterval = if (apiUrl == Constant.TEST_ENDPOINT) 1.hours else 0.milliseconds,
+            onIntervalChanged = {
+                setInterval(it)
             }
         )
 
@@ -170,8 +175,8 @@ fun SetupScreenPreview() {
             setModel = {},
             prompt = "",
             setPrompt = {},
-            notificationHours = 1,
-            setNotificationHours = {},
+            interval = 1.hours,
+            setInterval = {},
             contextSize = 2000,
             setContextSize = {}
         )

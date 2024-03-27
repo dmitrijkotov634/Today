@@ -9,8 +9,9 @@
 
     <string name="periodicity">Периодичность</string>
 
-    <string name="every_hour">Раз в час</string>
+    <string name="every_hour">Каждый час</string>
     <string name="every_hours">Каждые %1$d часа</string>
+    <string name="every_minutes">Каждые %1$d минут</string>
     <string name="every_hours_5h">Каждые %1$d часов</string>
 
     <string name="context_size">Размер контекста</string>

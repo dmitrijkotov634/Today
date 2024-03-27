@@ -5,6 +5,7 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.wavecat.today.preferences.BooleanPreference
 import com.wavecat.today.preferences.IntPreference
+import com.wavecat.today.preferences.LongPreference
 import com.wavecat.today.preferences.StringPreference
 import com.wavecat.today.worker.models.Message
 import kotlinx.serialization.encodeToString
@@ -19,8 +20,7 @@ class DataRepository(context: Context) {
     var model by StringPreference(preferences, MODEL, Constant.GPT_3_5_TURBO)
     var contextSize by IntPreference(preferences, CONTEXT_SIZE, 1000)
     var prompt by StringPreference(preferences, PROMPT, Constant.BASE_PROMPT)
-    var notificationHours by IntPreference(preferences, NOTIFICATION_HOURS, 1)
-    var suggestion by StringPreference(preferences, SUGGESTION, "")
+    var interval by LongPreference(preferences, INTERVAL, 3600000)
     var showErrors by BooleanPreference(preferences, SHOW_ERRORS, false)
 
     var messageContext: List<Message>
@@ -38,8 +38,7 @@ class DataRepository(context: Context) {
         const val MODEL = "model"
         const val CONTEXT_SIZE = "context_size"
         const val PROMPT = "prompt"
-        const val NOTIFICATION_HOURS = "notification_hours"
-        const val SUGGESTION = "suggestion"
+        const val INTERVAL = "interval"
         const val SHOW_ERRORS = "show_errors"
         const val MESSAGE_CONTEXT = "message_context"
     }

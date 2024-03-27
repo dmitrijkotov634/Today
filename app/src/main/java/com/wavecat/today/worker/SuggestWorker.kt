@@ -115,8 +115,6 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
             }
 
             message.content?.let {
-                repository.suggestion = it
-
                 GlanceAppWidgetManager(applicationContext).getGlanceIds(TodayWidget::class.java)
                     .forEach { glanceId ->
                         updateAppWidgetState(applicationContext, glanceId) { mutablePreferences ->

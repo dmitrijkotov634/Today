@@ -9,7 +9,7 @@ import kotlin.reflect.KProperty
 class StringPreference(
     private val preferences: SharedPreferences,
     private val name: String,
-    private val defaultValue: String = String()
+    private val defaultValue: String
 ) : ReadWriteProperty<Any, String?> {
 
     @WorkerThread

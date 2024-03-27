@@ -6,6 +6,10 @@ import com.wavecat.today.worker.SuggestWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class MainViewModel(
     private val repository: DataRepository,
@@ -23,8 +27,8 @@ class MainViewModel(
     private val _prompt = MutableStateFlow(repository.prompt)
     val prompt = _prompt.asStateFlow()
 
-    private val _notificationHours = MutableStateFlow(repository.notificationHours)
-    val notificationHours = _notificationHours.asStateFlow()
+    private val _interval = MutableStateFlow(repository.interval.toDuration(DurationUnit.MILLISECONDS))
+    val interval = _interval.asStateFlow()
 
     private val _apiUrl = MutableStateFlow(repository.apiUrl).also {
         if (it.value == Constant.TEST_ENDPOINT)
@@ -44,6 +48,9 @@ class MainViewModel(
     private fun setTestRequired() {
         setContextSize(1000)
         setModel(Constant.GPT_3_5_TURBO)
+
+        if (interval.value < 1.hours)
+            setInterval(1.hours)
     }
 
     fun setApiKey(text: String) {
@@ -66,9 +73,9 @@ class MainViewModel(
         repository.prompt = text
     }
 
-    fun setNotificationHours(value: Int) {
-        _notificationHours.value = value
-        repository.notificationHours = value
+    fun setInterval(value: Duration) {
+        _interval.value = value
+        repository.interval = value.inWholeMilliseconds
     }
 
     fun onPause() {
@@ -86,7 +93,7 @@ class MainViewModel(
             SUGGEST,
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             PeriodicWorkRequestBuilder<SuggestWorker>(
-                repository.notificationHours.toLong(), TimeUnit.HOURS
+                repository.interval, TimeUnit.MILLISECONDS
             )
                 .setConstraints(
                     Constraints.Builder()
