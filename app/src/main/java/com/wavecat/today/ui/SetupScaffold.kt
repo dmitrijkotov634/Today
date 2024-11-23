@@ -5,7 +5,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +32,9 @@ fun SetupScaffold(
     coroutineScope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     scrollBehavior: TopAppBarScrollBehavior,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    isWidgetConfiguration: Boolean,
+    onSuccessConfiguration: () -> Unit,
 ) {
     val successString = stringResource(R.string.success)
 
@@ -35,17 +46,24 @@ fun SetupScaffold(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(successString)
-                    }
+            if (isWidgetConfiguration)
+                ExtendedFloatingActionButton(
+                    onClick = { onSuccessConfiguration() },
+                    icon = { Icon(Icons.Filled.Check, stringResource(R.string.apply)) },
+                    text = { Text(stringResource(R.string.apply)) },
+                )
+            else
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(successString)
+                        }
 
-                    viewModel.apply()
-                },
-                icon = { Icon(Icons.Filled.Check, stringResource(R.string.apply)) },
-                text = { Text(stringResource(R.string.apply)) },
-            )
+                        viewModel.generate()
+                    },
+                    icon = { Icon(Icons.Filled.PlayArrow, stringResource(R.string.generate)) },
+                    text = { Text(stringResource(R.string.generate)) },
+                )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)

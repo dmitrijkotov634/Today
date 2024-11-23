@@ -4,15 +4,26 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.*
-import androidx.glance.action.actionStartActivity
-import androidx.glance.action.clickable
+import androidx.glance.ColorFilter
+import androidx.glance.GlanceId
+import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
-import androidx.glance.layout.*
+import androidx.glance.background
+import androidx.glance.currentState
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
+import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.padding
+import androidx.glance.layout.size
+import androidx.glance.layout.width
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.wavecat.today.MainActivity
 import com.wavecat.today.R
 
 object TodayWidget : GlanceAppWidget() {
@@ -31,7 +42,7 @@ object TodayWidget : GlanceAppWidget() {
         Box(modifier = GlanceModifier.fillMaxHeight()) {
             Row(
                 modifier = GlanceModifier
-                    .clickable(actionStartActivity<MainActivity>())
+                    //  .clickable(actionStartActivity<MainActivity>())
                     .background(GlanceTheme.colors.primaryContainer)
                     .padding(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,

@@ -1,10 +1,21 @@
 package com.wavecat.today.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +44,7 @@ fun SetupScreen(
     interval: Duration,
     setInterval: (Duration) -> Unit,
     contextSize: Int,
-    setContextSize: (Int) -> Unit
+    setContextSize: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -65,6 +76,28 @@ fun SetupScreen(
                 onClick = { setApiUrl(Constant.OPENAI_ENDPOINT) },
                 label = { Text("OpenAI") }
             )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            SuggestionChip(
+                onClick = {
+                    setApiUrl(Constant.GROQ_ENDPOINT)
+                    setApiKey(Constant.DEFAULT_GROQ_KEY)
+                    setModel(Constant.DEFAULT_GROQ_MODEL)
+                },
+                label = { Text("Groq Cloud") }
+            )
+        }
+
+        AnimatedVisibility(isTestEndpoint) {
+            Spacer(modifier = Modifier.height(26.dp))
+
+            Text(
+                text = stringResource(id = R.string.testing_warning),
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -104,13 +137,13 @@ fun SetupScreen(
             Slider(
                 value = contextSize.toFloat(),
                 onValueChange = { setContextSize(it.toInt()) },
-                valueRange = 1000f..4000f,
+                valueRange = 500f..9000f,
                 enabled = !isTestEndpoint,
-                steps = 5
+                steps = 16
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = prompt,
@@ -173,7 +206,7 @@ fun SetupScreenPreview() {
             setApiUrl = {},
             apiKey = "",
             setApiKey = {},
-            model = Constant.GPT_3_5_TURBO,
+            model = Constant.DEFAULT_MODEL,
             setModel = {},
             prompt = "",
             setPrompt = {},

@@ -1,8 +1,7 @@
 package com.wavecat.today
 
-import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.preference.PreferenceManager
 import com.wavecat.today.preferences.BooleanPreference
 import com.wavecat.today.preferences.IntPreference
 import com.wavecat.today.preferences.LongPreference
@@ -12,14 +11,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
-class DataRepository(context: Context) {
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-
-    var apiUrl by StringPreference(preferences, API_URL, Constant.TEST_ENDPOINT)
-    var apiKey by StringPreference(preferences, API_KEY, "")
-    var model by StringPreference(preferences, MODEL, Constant.GPT_3_5_TURBO)
-    var contextSize by IntPreference(preferences, CONTEXT_SIZE, 1000)
-    var prompt by StringPreference(preferences, PROMPT, Constant.BASE_PROMPT)
+class DataRepository(private val preferences: SharedPreferences, prefix: String) {
+    var apiUrl by StringPreference(preferences, "$prefix$API_URL", Constant.TEST_ENDPOINT)
+    var apiKey by StringPreference(preferences, "$prefix$API_KEY", "")
+    var model by StringPreference(preferences, "$prefix$MODEL", Constant.DEFAULT_MODEL)
+    var contextSize by IntPreference(preferences, "$prefix$CONTEXT_SIZE", 500)
+    var prompt by StringPreference(preferences, "$prefix$PROMPT", Constant.BASE_PROMPT)
     var interval by LongPreference(preferences, INTERVAL, 3600000)
     var showErrors by BooleanPreference(preferences, SHOW_ERRORS, false)
 

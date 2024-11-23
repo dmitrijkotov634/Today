@@ -14,10 +14,12 @@
     <string name="every_minutes">Once every %1$d minutes</string>
     <string name="every_hours_5h">Once every %1$d hours</string>
 
-    <string name="context_size">Context size</string>
+    <string name="context_size">Max context size</string>
 
     <string name="apply">Apply</string>
+    <string name="generate">Generate</string>
     <string name="success">Success</string>
 
-    <string name="free_testing">Free for testing</string>
+    <string name="free_testing">Testing</string>
+    <string name="testing_warning">The testing API has limitations such as context size and number of generations</string>
 </resources>

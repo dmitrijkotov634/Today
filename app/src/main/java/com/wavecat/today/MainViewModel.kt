@@ -1,7 +1,11 @@
 package com.wavecat.today
 
 import androidx.lifecycle.ViewModel
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.wavecat.today.worker.SuggestWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +17,7 @@ import kotlin.time.toDuration
 
 class MainViewModel(
     private val repository: DataRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : ViewModel() {
     private val _apiKey = MutableStateFlow(repository.apiKey)
     val apiKey = _apiKey.asStateFlow()
@@ -46,8 +50,8 @@ class MainViewModel(
     }
 
     private fun setTestRequired() {
-        setContextSize(1000)
-        setModel(Constant.GPT_3_5_TURBO)
+        setContextSize(500)
+        setModel(Constant.DEFAULT_MODEL)
 
         if (interval.value < 1.hours)
             setInterval(1.hours)
@@ -86,7 +90,7 @@ class MainViewModel(
         repository.showErrors = true
     }
 
-    fun apply() {
+    fun generate() {
         repository.messageContext = emptyList()
 
         workManager.enqueueUniquePeriodicWork(

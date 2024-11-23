@@ -14,10 +14,13 @@
     <string name="every_minutes">Каждые %1$d минут</string>
     <string name="every_hours_5h">Каждые %1$d часов</string>
 
-    <string name="context_size">Размер контекста</string>
+    <string name="context_size">Максимальный размер контекста</string>
 
     <string name="apply">Применить</string>
+    <string name="generate">Сгенерировать</string>
     <string name="success">Успешно</string>
 
-    <string name="free_testing">Бесплатно для тестирования</string>
+    <string name="free_testing">Тестирование</string>
+    <string name="testing_warning">Бесплатное API имеет ограничение на размер контекста и на количество
+        генераций</string>
 </resources>

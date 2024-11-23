@@ -1,5 +1,9 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:configure="com.wavecat.today.MainActivity"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="50dp"
     android:minHeight="30dp"
-    android:resizeMode="horizontal|vertical" />
+    android:resizeMode="horizontal|vertical"
+    android:widgetFeatures="reconfigurable"
+    tools:targetApi="p" />

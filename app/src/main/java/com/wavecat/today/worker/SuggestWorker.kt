@@ -10,15 +10,18 @@ import android.content.pm.PackageManager
 import android.os.BatteryManager
 import android.os.Build
 import android.service.notification.StatusBarNotification
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.knuddels.jtokkit.Encodings
 import com.knuddels.jtokkit.api.ModelType
+import com.wavecat.today.Constant
 import com.wavecat.today.DataRepository
 import com.wavecat.today.R
 import com.wavecat.today.services.NotificationService
@@ -27,17 +30,23 @@ import com.wavecat.today.ui.widget.TodayWidget
 import com.wavecat.today.worker.models.CompletionsInput
 import com.wavecat.today.worker.models.CompletionsResult
 import com.wavecat.today.worker.models.Message
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 
 class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
@@ -55,6 +64,7 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
         defaultRequest {
             contentType(ContentType.Application.Json)
+            header("User-Agent", "Ktor client")
         }
     }
 
@@ -68,9 +78,59 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
         }
     )
 
-    private val repository = DataRepository(applicationContext)
+    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+    private val notificationManager = NotificationManagerCompat.from(applicationContext)
 
     override suspend fun doWork(): Result {
+        val default = DataRepository(sharedPreferences, Constant.DEFAULT_PREFERENCES)
+
+        runCatching {
+            if (ActivityCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                val channel = notificationManager.getNotificationChannelCompat(CHANNEL_ID)
+
+                if (channel != null && channel.importance != NotificationManagerCompat.IMPORTANCE_NONE) {
+                    Log.d(Constant.TAG, "generate(DEFAULT)")
+
+                    generate(default)?.let {
+                        notify(it)
+                    }
+                }
+            }
+
+            val glanceManager = GlanceAppWidgetManager(applicationContext)
+
+            glanceManager.getGlanceIds(TodayWidget::class.java)
+                .forEach { glanceId ->
+                    Log.d(Constant.TAG, "generate($glanceId)")
+
+                    generate(
+                        DataRepository(
+                            sharedPreferences,
+                            glanceManager.getAppWidgetId(glanceId).toString()
+                        )
+                    )?.let {
+                        updateAppWidgetState(applicationContext, glanceId) { mutablePreferences ->
+                            mutablePreferences[TodayWidget.suggestion] = it
+                            TodayWidget.update(applicationContext, glanceId)
+                        }
+                    }
+                }
+        }
+            .onFailure {
+                if (default.showErrors)
+                    notify(it.message.toString())
+
+                it.printStackTrace()
+            }
+
+        return Result.success()
+    }
+
+    private suspend fun generate(repository: DataRepository): String? {
         var prompt = repository.prompt
 
         for ((k, v) in replaceable) {
@@ -87,48 +147,25 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
             repository.contextSize
         )
 
-        runCatching {
-            client.post {
-                url(repository.apiUrl)
-                bearerAuth(repository.apiKey)
-                setBody(
-                    CompletionsInput(
-                        repository.model,
-                        inputMessages
-                    )
+        val response = client.post {
+            url(repository.apiUrl)
+            bearerAuth(repository.apiKey)
+            setBody(
+                CompletionsInput(
+                    repository.model,
+                    inputMessages
                 )
-            }.body<CompletionsResult>()
-        }.onFailure {
-            notifyError(it.message.toString())
-            it.printStackTrace()
-        }.onSuccess { response ->
-            val message = response.choices?.get(0)?.message
+            )
+        }.body<CompletionsResult>()
 
-            if (message == null) {
-                notifyError(response.error.toString())
-                return@onSuccess
-            }
+        val message = response.choices?.get(0)?.message ?: throw response.error!!
 
-            repository.messageContext = buildList {
-                addAll(inputMessages)
-                add(message)
-            }
-
-            message.content?.let {
-                GlanceAppWidgetManager(applicationContext).getGlanceIds(TodayWidget::class.java)
-                    .forEach { glanceId ->
-                        updateAppWidgetState(applicationContext, glanceId) { mutablePreferences ->
-                            mutablePreferences[TodayWidget.suggestion] = it
-                        }
-
-                        TodayWidget.update(applicationContext, glanceId)
-                    }
-
-                notify(it)
-            }
+        repository.messageContext = buildList {
+            addAll(inputMessages)
+            add(message)
         }
 
-        return Result.success()
+        return message.content
     }
 
     private fun getBatteryLevel(): String {
@@ -141,7 +178,7 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
     private fun getNotifications(): String = buildString {
         val notificationService: NotificationService = NotificationService.instance ?: return@buildString
-        val notifications: Array<StatusBarNotification> = notificationService.getActiveNotifications()
+        val notifications: Array<StatusBarNotification> = notificationService.activeNotifications
 
         notifications.forEachIndexed { index, notification ->
             if (notification.packageName == applicationContext.packageName) return@forEachIndexed
@@ -150,7 +187,8 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
             runCatching {
                 val packageManager: PackageManager = applicationContext.packageManager
-                val info = packageManager.getApplicationInfo(notification.packageName, PackageManager.GET_META_DATA)
+                val info =
+                    packageManager.getApplicationInfo(notification.packageName, PackageManager.GET_META_DATA)
                 packageManager.getApplicationLabel(info) as String
             }.onSuccess { appName ->
                 append("$appName: ")
@@ -171,14 +209,7 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
         }
     }
 
-    private fun notifyError(content: String) {
-        if (repository.showErrors)
-            notify(content)
-    }
-
     private fun notify(content: String) {
-        val notificationManager = NotificationManagerCompat.from(applicationContext)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name: CharSequence = applicationContext.getString(R.string.app_name)
             val importance = NotificationManager.IMPORTANCE_LOW

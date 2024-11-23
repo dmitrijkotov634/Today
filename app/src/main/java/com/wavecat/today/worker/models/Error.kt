@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Error(
-    val message: String,
-    val type: String? = null
-)
+    override val message: String,
+    val type: String? = null,
+) : Throwable(message)
