@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
         val appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
-        )
+        ).takeIf { it != AppWidgetManager.INVALID_APPWIDGET_ID }
 
         setContent {
             TodayTheme {

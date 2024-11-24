@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Context.BATTERY_SERVICE
 import android.content.pm.PackageManager
@@ -85,6 +86,29 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
         val default = DataRepository(sharedPreferences, Constant.DEFAULT_PREFERENCES)
 
         runCatching {
+            val glanceManager = GlanceAppWidgetManager(applicationContext)
+
+            glanceManager.getGlanceIds(TodayWidget::class.java)
+                .forEach { glanceId ->
+                    val appWidgetId = glanceManager.getAppWidgetId(glanceId)
+
+                    if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                        Log.d(Constant.TAG, "generate($glanceId)")
+
+                        generate(
+                            DataRepository(
+                                sharedPreferences,
+                                appWidgetId.toString()
+                            )
+                        )?.let {
+                            updateAppWidgetState(applicationContext, glanceId) { mutablePreferences ->
+                                mutablePreferences[TodayWidget.suggestion] = it
+                                TodayWidget.update(applicationContext, glanceId)
+                            }
+                        }
+                    }
+                }
+
             if (ActivityCompat.checkSelfPermission(
                     applicationContext,
                     Manifest.permission.POST_NOTIFICATIONS
@@ -94,31 +118,9 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
                 if (channel != null && channel.importance != NotificationManagerCompat.IMPORTANCE_NONE) {
                     Log.d(Constant.TAG, "generate(DEFAULT)")
-
-                    generate(default)?.let {
-                        notify(it)
-                    }
+                    generate(default)?.let { notify(it) }
                 }
             }
-
-            val glanceManager = GlanceAppWidgetManager(applicationContext)
-
-            glanceManager.getGlanceIds(TodayWidget::class.java)
-                .forEach { glanceId ->
-                    Log.d(Constant.TAG, "generate($glanceId)")
-
-                    generate(
-                        DataRepository(
-                            sharedPreferences,
-                            glanceManager.getAppWidgetId(glanceId).toString()
-                        )
-                    )?.let {
-                        updateAppWidgetState(applicationContext, glanceId) { mutablePreferences ->
-                            mutablePreferences[TodayWidget.suggestion] = it
-                            TodayWidget.update(applicationContext, glanceId)
-                        }
-                    }
-                }
         }
             .onFailure {
                 if (default.showErrors)
