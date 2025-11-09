@@ -6,7 +6,7 @@ import com.wavecat.today.worker.models.Message
 fun trimMessages(
     encoding: Encoding,
     inputMessages: List<Message>,
-    tokenLimit: Int
+    tokenLimit: Int,
 ): List<Message> = buildList {
     var numTokens = 0
 

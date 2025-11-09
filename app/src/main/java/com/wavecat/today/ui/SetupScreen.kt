@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.wavecat.today.Constant
 import com.wavecat.today.R
 import com.wavecat.today.ui.theme.TodayTheme
-import com.wavecat.today.worker.SuggestWorker
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
@@ -154,14 +153,14 @@ fun SetupScreen(
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = ExpressionTransformation(
                 MaterialTheme.colorScheme.primary,
-                variables = variables
+                variables = Constant.variables
             )
         )
 
         Spacer(modifier = Modifier.height(4.dp))
 
         Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-            for (variable in variables) {
+            for (variable in Constant.variables) {
                 SuggestionChip(
                     onClick = { setPrompt("$prompt $variable") },
                     label = { Text(variable) }
@@ -189,13 +188,6 @@ fun SetupScreen(
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
-val variables = listOf(
-    SuggestWorker.NOTIFICATIONS_VAR,
-    SuggestWorker.SCREEN_CONTENT_VAR,
-    SuggestWorker.BATTERY_LEVEL_VAR,
-    SuggestWorker.DATE_AND_TIME_VAR
-)
 
 @Preview(showBackground = true)
 @Composable

@@ -37,16 +37,16 @@ class MainActivity : ComponentActivity() {
                 .launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
 
-        if (!NotificationManagerCompat.getEnabledListenerPackages(this)
-                .contains(packageName)
-        ) {
+        if (!NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)) {
             val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
             startActivity(intent)
         }
 
         val appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
-        ).takeIf { it != AppWidgetManager.INVALID_APPWIDGET_ID }
+        ).takeIf {
+            it != AppWidgetManager.INVALID_APPWIDGET_ID
+        }
 
         setContent {
             TodayTheme {

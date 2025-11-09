@@ -53,7 +53,7 @@ import java.util.Locale
 class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     private val registry = Encodings.newLazyEncodingRegistry()
-    val encoding by lazy { registry.getEncodingForModel(ModelType.GPT_3_5_TURBO)!! }
+    val encoding by lazy { registry.getEncodingForModel(ModelType.GPT_4)!! }
 
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
@@ -70,10 +70,10 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
     }
 
     private val replaceable = mapOf(
-        NOTIFICATIONS_VAR to ::getNotifications,
-        BATTERY_LEVEL_VAR to ::getBatteryLevel,
-        SCREEN_CONTENT_VAR to ::getScreenContent,
-        DATE_AND_TIME_VAR to {
+        Constant.NOTIFICATIONS_VAR to ::getNotifications,
+        Constant.BATTERY_LEVEL_VAR to ::getBatteryLevel,
+        Constant.SCREEN_CONTENT_VAR to ::getScreenContent,
+        Constant.DATE_AND_TIME_VAR to {
             val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm", Locale.ENGLISH)
             dateFormat.format(Date())
         }
@@ -241,10 +241,5 @@ class SuggestWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
     companion object {
         private const val CHANNEL_ID = "suggest"
-
-        const val NOTIFICATIONS_VAR = "%NOTIFICATIONS%"
-        const val SCREEN_CONTENT_VAR = "%SCREENCONTENT%"
-        const val DATE_AND_TIME_VAR = "%DATETIME%"
-        const val BATTERY_LEVEL_VAR = "%BATTERYLEVEL%"
     }
 }
